@@ -1,0 +1,5 @@
+<oo>
+    <setting id="displaynameTileentity">
+        "DISPLAYNAME" + TAB + ALIGNRIGHT + WHITE+ "RETURN"
+    </setting>
+</oo>

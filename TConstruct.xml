@@ -1,0 +1,15 @@
+<!--Author: ViKaleidoscope-->
+<!--Date: 2015/04/22-->
+<!--Version: 1.7.10-1.8.4-->
+<oo>
+    <tileentity id="TConstruct.Smeltery">
+        <line>
+		if(nbt['ValidStructure']!=0){
+            return translate('hud.msg.TConstruct.Layer')+": "+nbt['Layers']}
+        </line>
+        <line>
+		if(nbt['ValidStructure']!=0){
+            return translate('hud.msg.TConstruct.Capacity')+": "+nbt['MaxLiquid']+" mB"}
+        </line>
+    </tileentity>
+</oo>

@@ -1,0 +1,15 @@
+<!--Author: EpixZhang-->
+<!--Date: 2015/2/8-->
+<!--Version: 1.7.10-->
+<oo>
+    <entity id="Cow">
+        <line displayname="产奶倒计时">
+            return nbt['ForgeData']['Milked']
+        </line>
+    </entity>
+    <tooltip id="minecraft:skull">
+        <line displayname="OwnerName">
+            return nbt['SkullOwner']
+        </line>
+    </tooltip>
+</oo>

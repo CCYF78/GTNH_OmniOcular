@@ -1,0 +1,61 @@
+<!--Date: 2015/04/19-->
+<!--Version: 2.2.8.367-->
+<oo>
+	<init>
+		function formatNum(n){
+			if(10>n)
+			{
+				return '  '+n;
+			}
+			if(100>n)
+			{
+				return ' '+n;
+			}
+			return n;
+		}
+	</init>
+	<init>
+		function getRedStone(wire){
+			if(wire['parts'][0]['signal']!=undefined)
+			{
+				if(wire['parts'][0]['id']!=undefined)
+				{
+					if(wire['parts'][0]['id']=='pr_redwire')
+					{
+						if(wire['parts'][0]['signal']>=0)
+						{
+						return YELLOW+"信号强度: "+RED+formatNum(wire['parts'][0]['signal'])
+						}
+						return YELLOW+"信号强度: "+YELLOW+formatNum(256+wire['parts'][0]['signal'])
+					}
+				}
+			}
+		}
+	</init>
+		<init>
+		function getRedStone2(wire){
+			if(wire['parts'][0]['signal']!=undefined)
+			{
+				if(wire['parts'][0]['id']!=undefined)
+				{
+					if(wire['parts'][0]['id']=='pr_redwire')
+					{
+						if(wire['parts'][0]['signal']>=0)
+						{
+						return RED+"红石强度: "+RED+formatNum(Math.ceil((wire['parts'][0]['signal'])/17))
+						}
+						return RED+"红石强度: "+YELLOW+formatNum(Math.ceil((256+wire['parts'][0]['signal'])/17))
+					}
+				}
+			}
+		}
+	</init>
+	<tileentity id="savedMultipart">
+		<line>
+            getRedStone(nbt)
+		</line>
+		<line>
+            getRedStone2(nbt)
+		</line>
+	</tileentity>
+</oo>

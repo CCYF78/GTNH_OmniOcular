@@ -1,0 +1,53 @@
+<!--Author: EpixZhang -->
+<!--Date: 2014/11/17-->
+<!--Version: v1.2.0Beta23(1.7.10)-->
+
+<!--Date: 2023/11/28-->
+<!--Edit: Xi_Dauphal-->
+<oo>
+    <tileentity id="containerAltar">
+		<line displayname="§6祭坛等级">
+            return GOLD+nbt['upgradeLevel']
+        </line>
+		<line displayname="§d速度增益">
+            return YELLOW+Math.round((nbt['consumptionMultiplier']+1)*100)+AQUA+" %"
+        </line>
+        <line displayname="§d宝珠增益">
+            return YELLOW+Math.round(nbt['orbCapacityMultiplier']*100)+AQUA+" %"
+        </line>
+        <line displayname="§d献祭增益">
+            return YELLOW+Math.round((nbt['sacrificeEfficiencyMultiplier']+1)*100)+AQUA+" %"
+        </line>
+        <line displayname="§d牺牲增益">
+            return YELLOW+Math.round((nbt['selfSacrificeEfficiencyMultiplier']+1)*100)+AQUA+" %"
+        </line>
+		<line displayname="§d转位增益">
+            return YELLOW+Math.round(nbt['dislocationMultiplier']*20)+AQUA+" LP/t"
+        </line>
+        <line displayname="§c生命本质§f(§cLP§f)">
+            return RED+standards(nbt['Amount'])
+        </line>
+        <line displayname="§b祭坛容量§f(§bCapacity§f)">
+            return AQUA+standards(nbt['capacity'])
+        </line>
+		<line displayname="§b工作进程§f(§bProcess§f)">
+            if (nbt['isActive']==1 && nbt['canBeFilled']==0){return YELLOW+((nbt['progress']/(nbt['liquidRequired']*nbt['Inventory'][0]['Count']))*100).toFixed(1)+AQUA+' %'+'\\n'+AQUA+'===='+YELLOW+standards(nbt['progress'])+GOLD+" / "+AQUA+standards(nbt['liquidRequired']*nbt['Inventory'][0]['Count'])+'===='}
+			if (nbt['isActive']==1 && nbt['canBeFilled']==1){return '\\n'+'\\t'+AQUA+'===='+YELLOW+'正在为宝珠充能'+AQUA+'===='}
+        </line>
+    </tileentity>
+    <tileentity id="containerMasterStone">
+		<line displayname="§6所有者">
+            return GOLD+nbt['owner']
+        </line>
+        <line displayname="§b当前仪式">
+			Rit="ritual."+nbt['currentRitualString'].toString()+".name";
+			if (nbt['isActive']==1){return YELLOW+translate(Rit)}
+			if (nbt['isActive']==0){return YELLOW+'等待仪式启动'}
+        </line>
+    </tileentity>
+    <tileentity id="containerWritingTable">
+        <line displayname="§b工作进程">
+            return YELLOW+nbt['progress']+AQUA+" %"
+        </line>
+    </tileentity>
+</oo>

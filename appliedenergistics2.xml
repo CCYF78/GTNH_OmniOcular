@@ -1,0 +1,44 @@
+<!--Author: ViKaleidoscope -->
+<!--Date: 2015/04/22-->
+<!--Version: rv2-beta-28-->
+<oo>
+    <tileentity id="BlockDrive">
+        <line displayname="§b优先级">
+            return GOLD+nbt['priority']
+		</line>
+    </tileentity>
+	
+    <tileentity id="BlockChest">
+		<line displayname="§b优先级">
+            return GOLD+nbt['priority']
+        </line>
+    </tileentity>
+	
+	<tileentity id="BlockInterface">
+		<line displayname="§b名称：">
+            if(nbt['customName']!=undefined){return GOLD+nbt['customName']}
+        </line>
+    </tileentity>
+	
+	
+	<tileentity id="BlockCableBus">
+        <line displayname="§b已使用频道">
+			bbb=nbt['extra:6']['usedChannels'];
+				if(bbb!=undefined){
+					aaa=nbt['def:6']['Damage'];
+					if((aaa>=0&&aaa<=16)||(aaa>=20&&aaa<=36)||(aaa>=40&&aaa<=56)){
+						if(bbb==8)return  RED+bbb+WHITE+"/"+GOLD+8;
+						else return  GREEN+bbb+WHITE+"/"+GOLD+8;
+					}
+					else if((aaa>=60&&aaa<=76)||(aaa>=520&&aaa<=536)){
+						if(bbb==32)return  RED+bbb+WHITE+"/"+GOLD+32;
+						else return  GREEN+bbb+WHITE+"/"+GOLD+32;
+					}
+					else if((aaa>=540&&aaa<=556)||(aaa>=560&&aaa<=576)){
+						if(bbb==128)return RED+bbb+WHITE+"/"+GOLD+128;
+						else return  GREEN+bbb+WHITE+"/"+GOLD+128;
+					}
+				}
+        </line>
+   </tileentity>
+</oo>

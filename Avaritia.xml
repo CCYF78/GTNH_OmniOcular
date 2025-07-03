@@ -1,0 +1,262 @@
+<!--Torcherino.xml -->
+<!--Author: Pr -->
+<!--Date: 2015/04/25-->
+<!--Version: 1.9s-->
+
+<!--Author: Xi_Douphal-->
+<!--Date: 2023/11/27-->
+<oo>
+	<!--Avaritia-->
+    <tileentity id="Avaritia_Neutron">
+		<line displayname="§b工作进程">
+            if (nbt['Progress']>=0){return GOLD+(nbt['Progress']/7111*100).toFixed(1)+BLUE+' %'}
+		</line>
+	</tileentity>
+	<!--draconicevolution-->
+	<tileentity id="draconicevolution:TilePotentiometer">
+		<line displayname="§b发送红石信号">
+            if (nbt['Power']>=0){return GREEN+nbt['Power']+BLUE+'/'+AQUA+'15'}
+		</line>
+	</tileentity>
+	<entity id="EnderCrystal">
+        <line displayname="§6末影水晶">
+            return ""
+        </line>
+    </entity>
+	<entity id="DraconicEvolution.ChaosCrystal">
+        <line displayname="§6混沌水晶">
+            return ""
+        </line>
+		<line displayname="§6偷鸡小技巧">
+			{return "\\n"+"§5E§dn§4d§ce§er§aI§bo§3灵§9魂§1瓶§5可§d以§4抓§c偷§e鸡§a打§b龙"}
+		</line>
+    </entity>
+	<!--Pam's harvestcraft-->
+	<tileentity id="PamAnimalTrap">
+		<line displayname="§6剩余时间：">
+			if(nbt['ProduceTime']!=0){return formatTimes(nbt['RunTime'])}
+		</line>
+	</tileentity>
+	<tileentity id="PamApiary">
+		<line displayname="§6剩余时间：">
+			if(nbt['ProduceTime']!=0){return formatTimes(nbt['RunTime'])}
+		</line>
+	</tileentity>	
+	<tileentity id="PamFishTrap">
+		<line displayname="§6剩余时间：">
+			if(nbt['ProduceTime']!=0){return formatTimes(nbt['RunTime'])}
+		</line>
+	</tileentity>
+	<!--Furnace-->
+	<tileentity id="netherrackFurnace">
+		<line displayname="§6剩余时间：">
+			if(nbt['CookTime']!=0){return formatTimes(nbt['BurnTime'])}
+		</line>
+	</tileentity>	
+	<tileentity id="Furnace">
+        <line displayname="§6剩余时间：">
+			if(nbt['CookTime']!=0){return formatTimes(nbt['BurnTime'])}
+		</line>
+    </tileentity>
+	<!--Galacticraft-->
+	<entity id="GalacticraftCore.CargoRocket">
+		<line displayname="§6发射倒计时：">
+			return formatTimes(nbt['timeUntilLaunch'])
+		</line>
+		<line displayname="§b燃料：">
+            return standards(nbt['fuelTank']['Amount'])
+        </line>
+	</entity>
+	<entity id="GalacticraftCore.Spaceship">
+		<line displayname="§6发射倒计时：">
+			return formatTimes(nbt['timeUntilLaunch'])
+		</line>
+		<line displayname="§b燃料：">
+            return YELLOW+standards(nbt['fuelTank']['Amount'])
+        </line>
+	</entity>
+	<entity id="GalacticraftMars.SpaceshipT2">
+		<line displayname="§6发射倒计时：">
+			return formatTimes(nbt['timeUntilLaunch'])
+		</line>
+		<line displayname="§b燃料：">
+            return YELLOW+standards(nbt['fuelTank']['Amount'])
+        </line>
+	</entity>
+	<entity id="GalacticraftMars.Tier3RocketGC">
+		<line displayname="§6发射倒计时：">
+			return formatTimes(nbt['timeUntilLaunch'])
+		</line>
+		<line displayname="§b燃料：">
+            return YELLOW+standards(nbt['fuelTank']['Amount'])
+        </line>
+	</entity>
+	<entity id="GalacticraftCore.SpaceshipT4">
+		<line displayname="§6发射倒计时：">
+			return formatTimes(nbt['timeUntilLaunch'])
+		</line>
+		<line displayname="§b燃料：">
+            return YELLOW+standards(nbt['fuelTank']['Amount'])
+        </line>
+	</entity>
+	<entity id="GalacticraftCore.SpaceshipT5">
+		<line displayname="§6发射倒计时：">
+			return formatTimes(nbt['timeUntilLaunch'])
+		</line>
+		<line displayname="§b燃料：">
+            return YELLOW+standards(nbt['fuelTank']['Amount'])
+        </line>
+	</entity>
+	<entity id="GalacticraftCore.SpaceshipT6">
+		<line displayname="§6发射倒计时：">
+			return formatTimes(nbt['timeUntilLaunch'])
+		</line>
+		<line displayname="§b燃料：">
+            return YELLOW+standards(nbt['fuelTank']['Amount'])
+        </line>
+	</entity>
+	<entity id="GalacticraftCore.SpaceshipT7">
+		<line displayname="§6发射倒计时：">
+			return formatTimes(nbt['timeUntilLaunch'])
+		</line>
+		<line displayname="§b燃料：">
+            return YELLOW+standards(nbt['fuelTank']['Amount'])
+        </line>
+	</entity>
+	<entity id="GalacticraftCore.SpaceshipT8">
+		<line displayname="§6发射倒计时：">
+			return formatTimes(nbt['timeUntilLaunch'])
+		</line>
+		<line displayname="§b燃料：">
+            return YELLOW+standards(nbt['fuelTank']['Amount'])
+        </line>
+	</entity>
+	<entity id="GalacticraftAmunRa.Shuttle">
+		<line displayname="§6发射倒计时：">
+			return formatTimes(nbt['timeUntilLaunch'])
+		</line>
+		<line displayname="§b燃料：">
+            return YELLOW+standards(nbt['fuelTank']['Amount'])
+        </line>
+	</entity>
+	<!--Torcherino-->
+	<tileentity id="torcherino_tile">
+		<line displayname="§6加速等级：">
+            switch(nbt['Speed']){
+				case 0:
+					return AQUA+"0X";
+					break;
+				case 1:
+					return AQUA+"1X";
+					break;
+				case 2:
+					return AQUA+"2X";
+					break;
+				case 3:
+					return AQUA+"3X";
+					break;
+				case 4:
+					return AQUA+"4X";
+					break;
+				}
+        </line>
+        <line displayname="§6加速范围：">
+            switch(nbt['Mode']){
+				case 0:
+					return AQUA+"0x0x0";
+					break;
+				case 1:
+					return AQUA+"3x3x3";
+					break;
+				case 2:
+					return AQUA+"5x3x5";
+					break;
+				case 3:
+					return AQUA+"7x3x7";
+					break;
+				case 4:
+					return AQUA+"9x3x9";
+					break;
+				}
+        </line>
+    </tileentity>
+	<tileentity id="compressed_torcherino_tile">
+		<line displayname="§6加速等级：">
+            switch(nbt['Speed']){
+				case 0:
+					break;
+				case 1:
+					return AQUA+"9X";
+					break;
+				case 2:
+					return AQUA+"18X";
+					break;
+				case 3:
+					return AQUA+"27X";
+					break;
+				case 4:
+					return AQUA+"36X";
+					break;
+				}
+        </line>
+        <line displayname="§6加速范围：">
+            switch(nbt['Mode']){
+				case 0:
+					return AQUA+"0x0x0";
+					break;
+				case 1:
+					return AQUA+"3x3x3";
+					break;
+				case 2:
+					return AQUA+"5x3x5";
+					break;
+				case 3:
+					return AQUA+"7x3x7";
+					break;
+				case 4:
+					return AQUA+"9x3x9";
+					break;
+				}
+        </line>
+    </tileentity>
+	<tileentity id="double_compressed_torcherino_tile">
+		<line displayname="§6加速等级：">
+            switch(nbt['Speed']){
+				case 0:
+					return AQUA+"0X";
+					break;
+				case 1:
+					return AQUA+"81X";
+					break;
+				case 2:
+					return AQUA+"162X";
+					break;
+				case 3:
+					return AQUA+"243X";
+					break;
+				case 4:
+					return AQUA+"324X";
+					break;
+				}
+        </line>
+        <line displayname="§6加速范围：">
+            switch(nbt['Mode']){
+				case 0:
+					return AQUA+"0x0x0";
+					break;
+				case 1:
+					return AQUA+"3x3x3";
+					break;
+				case 2:
+					return AQUA+"5x3x5";
+					break;
+				case 3:
+					return AQUA+"7x3x7";
+					break;
+				case 4:
+					return AQUA+"9x3x9";
+					break;
+				}
+        </line>
+    </tileentity>
+</oo>

@@ -1,0 +1,14 @@
+<!--Date: 2015/04/22-->
+<!--Version: 1.7.10-0.24.1-->
+<oo>
+    <tileentity id="witchery:altar">
+        <line>
+            return nbt['Power'].toFixed(0)+" / "+nbt['MaxPower']*nbt['PowerScale']+" (x"+nbt['PowerScale']+")"
+        </line>
+    </tileentity>
+	<tileentity id="witchery:leechchest">
+        <line>
+            return translate('hud.msg.witchery.Owner')+" : "+nbt['WITCPlayers'][0]['Player']
+        </line>
+    </tileentity>
+</oo>

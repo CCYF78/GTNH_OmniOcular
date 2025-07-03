@@ -1,0 +1,14 @@
+<oo>
+<tileentity id="BaseMetaTileEntity">
+        <line displayname="工作模式">
+		if(nbt['mID']==1132)
+		switch(nbt['ssMode']){
+				case 0:return YELLOW+"粉碎-洗矿-热离-粉碎 30秒"; break;
+				case 1:return YELLOW+"粉碎-洗矿-粉碎-离心 15秒"; break;
+				case 2:return YELLOW+"粉碎-粉碎-离心 10秒"; break;
+				case 3:return YELLOW+"粉碎-洗矿-筛选 20秒"; break;
+				case 4:return YELLOW+"粉碎-浸洗-粉碎-离心 17秒"; break;
+				}
+        </line>
+   </tileentity>
+</oo>
