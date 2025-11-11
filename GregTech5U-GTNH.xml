@@ -510,7 +510,7 @@
 			};	
 		</line>
 
-		<!--XX集成矿处工作模式_HomeXX -->
+		<!--XX集成矿处工作模式XX -->
 		<line displayname="工作模式">
 			if(nbt['mID']==1132)
 			switch(nbt['ssMode']){
