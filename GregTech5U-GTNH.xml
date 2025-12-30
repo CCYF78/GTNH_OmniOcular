@@ -470,7 +470,7 @@
 				while(T7WaterSignal.length < 4){
 					T7WaterSignal = "0" + T7WaterSignal;
 				}
-				return AQUA + T7WaterSignal
+				return LPURPLE + T7WaterSignal
 			}
 		</line>
 
@@ -556,6 +556,69 @@
 					default: ok=(cnt==0); break;
 				}
 				return Percent(ok?100:0);
+			}
+		</line>
+
+		<!--八级水-->
+		<line displayname="§6夸克存储">
+			if(nbt['mID']==9414 && nbt['mActive']==1 && nbt['insertedItems'][0] != undefined){
+				if (nbt['insertedItems'][0] != undefined){
+					outputString = "\\n";
+					for (i=0; nbt['insertedItems'][i] != undefined; i++)
+					{
+						switch(nbt['insertedItems'][i]['Damage']){
+							case 32235: outputString += BLUE + "上"; break;
+							case 32236: outputString += LPURPLE + "下"; break;
+							case 32237: outputString += YELLOW + "奇"; break;
+							case 32238: outputString += GREEN + "粲"; break;
+							case 32239: outputString += AQUA + "底"; break;
+							case 32240: outputString += RED + "顶"; break;
+						}
+						if((i+1) % 6 == 0 && nbt['insertedItems'][i+1] != undefined) {
+							outputString += WHITE + " → " + "\\n";
+						} else if(nbt['insertedItems'][i+1] != undefined) {
+							outputString += WHITE + " → ";
+						}
+					}
+					return outputString;
+				} else {
+					return RED + "暂无夸克输入";
+				}
+			}
+		</line>
+
+		<line displayname="§6正确组合">
+			if(nbt['mID']==9414 && nbt['mActive']==1){
+				outputString = "";
+				var indices = nbt['correctStartIndex'] == -1 ? [-1, -1] : [nbt['correctStartIndex'], nbt['correctStartIndex'] + 1];
+				for (var i = 0; i < indices.length; i++) {
+					if(i > 0) outputString += WHITE + " + ";
+					var item = nbt['insertedItems'][indices[i]];
+					if(indices[i] == -1 || item == undefined){
+						outputString += GRAY + "??";
+					} else {
+						switch(item['Damage']){
+							case 32235: outputString += BLUE + "上"; break;
+							case 32236: outputString += LPURPLE + "下"; break;
+							case 32237: outputString += YELLOW + "奇"; break;
+							case 32238: outputString += GREEN + "粲"; break;
+							case 32239: outputString += AQUA + "底"; break;
+							case 32240: outputString += RED + "顶"; break;
+							default: outputString += GRAY + "??"; break;
+						}
+					}
+				}
+				return outputString;
+			}
+		</line>
+
+		<line displayname="§6成功几率">
+			if(nbt['mID']==9414 && nbt['mActive']==1){
+				if(nbt['correctStartIndex'] == -1){
+					return Percent(0)
+				}else{
+					return Percent(100)
+				}
 			}
 		</line>
 	
@@ -1177,7 +1240,6 @@
 			return GOLD+'('+VTier[nbt['casingTier']]+GOLD+')'
 			}
 		</line>
-
 
 		<!--XX多方块发电机XX -->
 		<line displayname="§d预计功率">
