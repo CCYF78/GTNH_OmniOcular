@@ -1453,7 +1453,7 @@
 
 		<!--蒸汽存量 -->
         <line displayname="§9蒸汽存量">
-            if(nbt['mSteam']['Amount']!=undefined){return nbt['mSteam']['Amount']*2+" L"}
+            if(nbt['mSteam']['Amount']!=undefined){return nbt['mSteam']['Amount']+" L"}
 		</line>
         <line displayname="§9蒸汽存量">
             if(nbt['mStoredSteam']!=0){return nbt['mStoredSteam']*2+" L"}
@@ -1468,13 +1468,19 @@
 		<!--大型热交换器：蒸汽生产速度 -->
 		<line displayname="§9正在生产">
 		    if(nbt['mActive']!=0) if(nbt['mEUt']!=undefined) if(nbt['mID']==1154)
-			if(nbt['superheated']==0){return GREEN+"蒸汽: "+YELLOW+Math.abs(nbt['mEUt']) * 2+YELLOW+" L/t"}
+			if(nbt['superheated']==0){
+				var effHU = (nbt['mEfficiency']==undefined || nbt['mEfficiency']==0)?10000:nbt['mEfficiency'];
+				return GREEN+"蒸汽: "+YELLOW+standards(Math.abs(nbt['mEUt'])*2*effHU/10000)+YELLOW+" L/t"
+			}
 		</line>
 		
 		<!--大型热交换器：过热蒸汽生产速度 -->
 		<line displayname="§9正在生产">
 		    if(nbt['mActive']!=0) if(nbt['mEUt']!=undefined) if(nbt['mID']==1154)
-			if(nbt['superheated']==1){return GREEN+"过热蒸汽: "+YELLOW+Math.abs(nbt['mEUt'])+WHITE+" L/t"}
+			if(nbt['superheated']==1){
+				var effHU2 = (nbt['mEfficiency']==undefined || nbt['mEfficiency']==0)?10000:nbt['mEfficiency'];
+				return GREEN+"过热蒸汽: "+YELLOW+standards(Math.abs(nbt['mEUt'])*effHU2/10000)+WHITE+" L/t"
+			}
 		</line>
 		
 	    <!--大型涡轮机：转子耐久 -->
@@ -1501,7 +1507,14 @@
 		<!--大型锅炉：蒸汽生产速度 -->
 		<line displayname="§b蒸汽生产">
 		    if(nbt['mActive']!=0) if(nbt['mEUt']!=undefined)
-			if(nbt['mID']==1020 || nbt['mID']==1021 || nbt['mID']==1022 || nbt['mID']==1023){return YELLOW+Math.abs(nbt['mEUt']) * 2+WHITE+" L/t"}
+			if(nbt['mID']==1020 || nbt['mID']==1021 || nbt['mID']==1022 || nbt['mID']==1023){
+				var effLB = (nbt['mEfficiency']==undefined || nbt['mEfficiency']==0)?10000:nbt['mEfficiency'];
+				var steamLB = Math.abs(nbt['mEUt'])*2*effLB/10000;
+				if(nbt['mID']==1022 || nbt['mID']==1023){
+					return YELLOW+"过热 "+standards(steamLB/3)+WHITE+" L/t"
+				}
+				return YELLOW+standards(steamLB)+WHITE+" L/t"
+			}
 		</line>
 		
 		<!--大型柴油引擎：效率 -->
@@ -1571,84 +1584,84 @@
 			}
 		</line>
 
-<!--		&lt;!&ndash; 机器物品输出 &ndash;&gt;-->
-<!--		<line displayname="§6物品输出">-->
-<!--			if (nbt['mActive']==1) {-->
-<!--				var outputString = "";-->
-<!--				var iname = [];-->
-<!--				var icount = [];-->
-<!--				var id_match = [];-->
-<!--				var coutile = 0;-->
-<!--				var slot = 0;-->
-<!--				var OilIf = nbt['mOutputItemsLength']==undefined?16:(nbt['mOutputItemsLength']+1);-->
-<!--				for (var i=0;i<OilIf;i++){-->
-<!--						if (nbt['mOutputItem'+i]==undefined){continue;}-->
-<!--						else {-->
-<!--							str = "mOutputItem"+i;-->
-<!--							coutile++;-->
-<!--							Idamage = nbt[str]['id']+":"+nbt[str]['Damage'];-->
-<!--							if (id_match.indexOf(Idamage)==-1){-->
-<!--								iname[slot] = name(nbt[str]);-->
-<!--								icount[slot] = nbt[str]['Count'];-->
-<!--								id_match[slot] = Idamage;-->
-<!--								slot++;-->
-<!--							}-->
-<!--							else {icount[id_match.indexOf(Idamage)] += nbt[str]['Count'];}}-->
-<!--					}-->
-<!--				if (coutile!=0){outputString +=GOLD+"循环"+GREEN+coutile+GOLD+"次" + ALIGNRIGHT+"\\n";-->
-<!--				for (var i=0;i<iname.length;i++){-->
-<!--					outputString += YELLOW + standards(icount[i]) + "个" + GREEN + iname[i] +ALIGNRIGHT;-->
-<!--					if (i!=iname.length-1){-->
-<!--						outputString +=  "\\n" ;-->
-<!--					}-->
-<!--				}-->
-<!--				return outputString;}-->
-<!--			}-->
-<!--		</line>-->
+		<!-- 机器物品输出 -->
+		<line displayname="§6物品输出">
+			if (nbt['mActive']==1) {
+				var outputString = "";
+				var iname = [];
+				var icount = [];
+				var id_match = [];
+				var coutile = 0;
+				var slot = 0;
+				var OilIf = nbt['mOutputItemsLength']==undefined?16:(nbt['mOutputItemsLength']+1);
+				for (var i=0;i<OilIf;i++){
+						if (nbt['mOutputItem'+i]==undefined){continue;}
+						else {
+							str = "mOutputItem"+i;
+							coutile++;
+							Idamage = nbt[str]['id']+":"+nbt[str]['Damage'];
+							if (id_match.indexOf(Idamage)==-1){
+								iname[slot] = name(nbt[str]);
+								icount[slot] = nbt[str]['Count'];
+								id_match[slot] = Idamage;
+								slot++;
+							}
+							else {icount[id_match.indexOf(Idamage)] += nbt[str]['Count'];}}
+					}
+				if (coutile!=0){outputString +=GOLD+"循环"+GREEN+coutile+GOLD+"次" + ALIGNRIGHT+"\\n";
+				for (var i=0;i<iname.length;i++){
+					outputString += YELLOW + standards(icount[i]) + "个" + GREEN + iname[i] +ALIGNRIGHT;
+					if (i!=iname.length-1){
+						outputString +=  "\\n" ;
+					}
+				}
+				return outputString;}
+			}
+		</line>
 
-<!--		&lt;!&ndash;机器：液体产物 &ndash;&gt;-->
-<!--		<line displayname="§6流体输出">-->
-<!--			if(nbt['mOutputFluid']['Amount']!=undefined){-->
-<!--				return "\\n"+AQUA+standards(nbt['mOutputFluid']['Amount'])+YELLOW+"L "+GREEN+fluidName(nbt['mOutputFluid']['FluidName'])-->
-<!--			}-->
-<!--		</line>-->
+		<!--机器：液体产物 -->
+		<line displayname="§6流体输出">
+			if(nbt['mOutputFluid']['Amount']!=undefined){
+				return "\\n"+AQUA+standards(nbt['mOutputFluid']['Amount'])+YELLOW+"L "+GREEN+fluidName(nbt['mOutputFluid']['FluidName'])
+			}
+		</line>
 
-<!--		&lt;!&ndash; 大型机器：液体产物 &ndash;&gt;-->
-<!--		<line displayname="§6流体输出">-->
-<!--			if (nbt['eFlip'] != undefined && nbt['mActive']==1) {-->
-<!--				var outputString2 = "";-->
-<!--				var fname = [];-->
-<!--				var fcount = [];-->
-<!--				var fname_match = [];-->
-<!--				var slot = 0;-->
-<!--				var coutile = 0;-->
-<!--				var OilIf = nbt['mOutputFluidsLength']==undefined?16:(nbt['mOutputFluidsLength']+1);-->
-<!--				for (var i=0;i<OilIf;i++){-->
-<!--					if (nbt['mOutputFluids'+i]==undefined){continue;}-->
-<!--					else {-->
-<!--							str = "mOutputFluids"+i;-->
-<!--							coutile++;-->
-<!--							Idamage = nbt[str]['FluidName'];-->
-<!--							if (fname_match.indexOf(Idamage)==-1){-->
-<!--								fname[slot] = fluidName(nbt[str]['FluidName']);-->
-<!--								fcount[slot] = nbt[str]['Amount'];-->
-<!--								fname_match[slot] = Idamage;-->
-<!--								slot++;-->
-<!--							}else {-->
-<!--								fcount[fname_match.indexOf(Idamage)] += nbt[str]['Amount'];-->
-<!--							}-->
-<!--						}-->
-<!--					}-->
-<!--				if (coutile!=0){outputString2 +=GOLD+"循环"+GREEN+coutile+GOLD+"次" + ALIGNRIGHT+"\\n";-->
-<!--				for (var i=0;i<fname.length;i++){-->
-<!--					outputString2 += AQUA + standards(fcount[i]) + YELLOW + "L" + GREEN + fname[i] +ALIGNRIGHT;-->
-<!--					if (i!=fname.length-1){-->
-<!--						outputString2 +=  "\\n" ;-->
-<!--					}-->
-<!--				}-->
-<!--				return outputString2;}-->
-<!--			}-->
-<!--		</line>-->
+		<!-- 大型机器：液体产物 -->
+		<line displayname="§6流体输出">
+			if (nbt['eFlip'] != undefined && nbt['mActive']==1) {
+				var outputString2 = "";
+				var fname = [];
+				var fcount = [];
+				var fname_match = [];
+				var slot = 0;
+				var coutile = 0;
+				var OilIf = nbt['mOutputFluidsLength']==undefined?16:(nbt['mOutputFluidsLength']+1);
+				for (var i=0;i<OilIf;i++){
+					if (nbt['mOutputFluids'+i]==undefined){continue;}
+					else {
+							str = "mOutputFluids"+i;
+							coutile++;
+							Idamage = nbt[str]['FluidName'];
+							if (fname_match.indexOf(Idamage)==-1){
+								fname[slot] = fluidName(nbt[str]['FluidName']);
+								fcount[slot] = nbt[str]['Amount'];
+								fname_match[slot] = Idamage;
+								slot++;
+							}else {
+								fcount[fname_match.indexOf(Idamage)] += nbt[str]['Amount'];
+							}
+						}
+					}
+				if (coutile!=0){outputString2 +=GOLD+"循环"+GREEN+coutile+GOLD+"次" + ALIGNRIGHT+"\\n";
+				for (var i=0;i<fname.length;i++){
+					outputString2 += AQUA + standards(fcount[i]) + YELLOW + "L" + GREEN + fname[i] +ALIGNRIGHT;
+					if (i!=fname.length-1){
+						outputString2 +=  "\\n" ;
+					}
+				}
+				return outputString2;}
+			}
+		</line>
 
 
 		<!-- 单方块：自动输出 -->
