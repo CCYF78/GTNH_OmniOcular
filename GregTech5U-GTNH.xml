@@ -14,10 +14,7 @@
 <!--Version: 5.09.44.85-GTNH -->
 <!--Date: 2023/11/24 -->
 <!--Expander: xi_douphal -->
-<!--注意: 1) 禁止使用 JS 的 // 单行注释(OO 合并时无换行, 会把后面全部代码吞掉). -->
-<!--      2) 脚本内容中不能出现美元符号(会被 appendReplacement 当作分组引用, 抛异常). -->
-<!--      3) 所有反斜杠必须写两个, 例如 /\\d/ , 单个反斜杠会抛 IllegalArgument. -->
-<!--      以上任一条都会导致 mergeConfig 失败, 表现为所有词条静默消失. 注释一律用 XML 注释. -->
+
 <oo>
 
 <init>
@@ -31,19 +28,6 @@
 
 	function isCharger(mID){
 		return Packages.gregtech.api.GregTechAPI.METATILEENTITIES[mID] instanceof Packages.gregtech.common.tileentities.machines.basic.MTECharger
-	}
-
-	function formatBytes(bytes) {
-		if (bytes === 0) return 0;
-		var k = 100000,
-		sizes = ['', '§f*10^5','§e*10^10','§6*10^15', '§d*10^20', '§d*10^25', '§4*10^30', '§d*10^35', '§d*10^40', colorcir('*10^45',3,1), colorcir('*10^50',3,1), colorcir('*10^55',3,1), colorcir('*10^60',3,1), colorcir('*10^65',3,1)],
-		i = Math.floor(Math.log(bytes) / Math.log(k));
-		if(sizes[i]){
-			jjj=bytes / Math.pow(k, i);
-			jjj=jjj.toFixed(jjj<10?2:(jjj<100?1:0));
-			return jjj+sizes[i]
-		}
-		return bytes
 	}
 
 	function formatBytes3(a) {
@@ -62,25 +46,6 @@
 		return ans;
 	}
 
-	function isBetween(min, max, val){
-		return min <= val && val <= max
-	}
-	function castToUnsigned(n){
-		if(n<0)
-		{
-			return 256+n
-		}
-		return n
-	}
-	function abcdefg(n){
-	aaaa=0;bbbb=1;k=0;j=1;
-		for(i=n.length()-1;i>=0;i--){
-			if(n[i]=="-")k=256-k;
-			else {k+=n[i]*j;j*=10;}
-			if(n[i-1]==","||i==0){aaaa+=k*bbbb;bbbb*=256;k=0;j=1;i--}
-		}
-		return aaaa
-	}
 	function standards(num) {
 		var prod = '', count = 0;
 		num = (Math.round(num) || 0).toString();
@@ -120,11 +85,47 @@
 		return stre;
 	}
 
-	function animatedText(text1,text2,text3,col,color){
-		if (typeof animatedText.time === "undefined") {
-			animatedText.time = 0;
+	function hex2(v) {
+		var t = Math.round(v * 255).toString(16);
+		if (t.length < 2) { t = "0" + t; }
+		return t;
+	}
+	function rgbCode(h) {
+		h = ((h % 360) + 360) % 360;
+		var hp = h / 60;
+		var x = 1 - Math.abs(hp % 2 - 1);
+		var r = 0, g = 0, b = 0;
+		if (hp < 1) { r = 1; g = x; }
+		else if (hp < 2) { r = x; g = 1; }
+		else if (hp < 3) { g = 1; b = x; }
+		else if (hp < 4) { g = x; b = 1; }
+		else if (hp < 5) { r = x; b = 1; }
+		else { r = 1; b = x; }
+		var s = hex2(r) + hex2(g) + hex2(b);
+		var o = "§x";
+		for (var i = 0; i < 6; i++) { o = o + "§" + s.charAt(i); }
+		return o;
+	}
+	function rainbow(txt, h0, span, rev) {
+		var s = "" + txt;
+		if (s.length < 1) { return ""; }
+		if (h0 == undefined) { h0 = 0; }
+		if (span == undefined) { span = 270; }
+		if (rev) { h0 = h0 + span; span = -span; }
+		var n = s.length;
+		var step = span / n;
+		var out = "";
+		for (var i = 0; i < n; i++) {
+			if (i == n - 1) {
+				out = out + rgbCode(h0 + span) + s.charAt(i);
+			} else {
+				out = out + "§g" + rgbCode(h0 + step * i) + rgbCode(h0 + step * (i + 1)) + s.charAt(i);
+			}
 		}
-		animatedText.time++;
+		return out + "§r";
+	}
+
+	function animatedText(text1,text2,text3,col,color,frame){
 		var cp = color || "";
 		var stylePrefix = "";
 		if (col === 1) stylePrefix = "§n";
@@ -142,50 +143,48 @@
 			while (words[wp].length < N) words[wp] += " ";
 		}
 
-		var HOLD = 3;
-		var SEG = HOLD + N + 1 + N;
-		var t = (animatedText.time - 1) % (SEG * 3);
+		var LEAD = 2 * N;
+		/* 保持 2N / 旧词乱码 N / 新词乱码 N / 逐个恢复 2N —— 恢复段留够长度，
+		   否则机器一卡顿跳一帧就会把整段恢复吃掉，看起来像一次性全变 */
+		var SEG = 6 * N;
+		/* 帧号默认取墙钟：WAILA 每 10 tick 刷一次，500ms 一帧正好每次刷新推进 1 帧，
+		   所有动画共用同一个相位，不会因为各自调用次数不同而跑偏 */
+		var t = ((frame == undefined) ? Math.floor(Date.now() / 500) : frame) % (SEG * 3);
 		var seg = Math.floor(t / SEG);
 		var pos = t % SEG;
 		var cur = words[seg];
 		var nxt = words[(seg + 1) % 3];
-		var output = "";
-
-		if (pos < HOLD) {
-			output = head;
-			for (var a1 = 0; a1 < N; a1++) output += cur.charAt(a1);
-		} else if (pos < HOLD + N) {
-			var k1 = pos - HOLD + 1;
-			output = head + "§k";
-			for (var a2 = 0; a2 < k1; a2++) output += cur.charAt(a2);
-			output += reset;
-			for (var a3 = k1; a3 < N; a3++) output += cur.charAt(a3);
-		} else if (pos < HOLD + N + 1) {
-			output = head + "§k";
-			for (var a4 = 0; a4 < N; a4++) output += cur.charAt(a4);
-		} else {
-			var k2 = pos - (HOLD + N + 1) + 1;
-			output = head;
-			for (var a5 = 0; a5 < k2; a5++) output += nxt.charAt(a5);
-			output += "§k";
-			for (var a6 = k2; a6 < N; a6++) output += cur.charAt(a6);
+		var out = head;
+		var inK = false;
+		for (var ac = 0; ac < N; ac++) {
+			var ti = pos - ac;
+			var ch;
+			var wantK;
+			if (ti < LEAD) { ch = cur.charAt(ac); wantK = false; }
+			else if (ti < LEAD + N) { ch = cur.charAt(ac); wantK = true; }
+			else if (ti < LEAD + N + N) { ch = nxt.charAt(ac); wantK = true; }
+			else { ch = nxt.charAt(ac); wantK = false; }
+			if (wantK != inK) {
+				if (wantK) { out = out + "§k"; } else { out = out + reset; }
+				inK = wantK;
+			}
+			out = out + ch;
 		}
-		return output;
+		if (inK) { out = out + reset; }
+		return out;
 	}
 
-	var VTier=['§7LV','§6MV','§eHV','§8EV','§aIV','§dLuv','§bZPM','§2UV','§4UHV','§5UEV','§9§n§lUIV','§c§n§lUMV','§4§n§lUXV','MAX'];
+	var VTier=['§cULV','§2LV','§6MV','§eHV','§8EV','§9IV','§dLuV','§bZPM','§2§nUV','§4§nUHV','§5§nUEV','§1§l§nUIV','§c§l§nUMV','§4§l§nUXV','MAX'];
 
 	function GetVtier(valuev){
-		stre2 = 0;value2 = 0;
-		if (valuev>536870915){stre2+=13}
-		for (i=0;i<13;i++){
-			if (value2!=0){break;}
-			tie = 8*Math.pow(4,i);
-			tie2 = 8*Math.pow(4,i+1);
-			if (tie<=valuev && valuev<= tie2){stre2+=i;value2++;}
+		if (valuev >= 2147483640) return colorcir('MAX',3,1);
+		if (valuev < 8) return VTier[0];
+		for (var vi = 0; vi < 14; vi++) {
+			var vt1 = 8 * Math.pow(4, vi);
+			var vt2 = 8 * Math.pow(4, vi + 1);
+			if (vt1 <= valuev && valuev < vt2) return VTier[vi];
 		}
-		if (stre2 >= 13) return colorcir('MAX',3,1);
-		return VTier[stre2];
+		return VTier[13];
 	}
 
 	function infoRaw(prefix) {
@@ -207,9 +206,53 @@
 		var om = otext.replace(/§./g, '').match(/[\\d,]+/g);
 		return (om == null) ? null : om[0].replace(/,/g, '');
 	}
-	function formatEU(snum) {
-		if (snum == null) return "";
-		return snum.length > 15 ? sci_format(snum) : standards(snum);
+
+	var EOHGENT = ['粗制','原始','稳定','先进','卓越','异星','完美','太初','鸿蒙'];
+	function eohGrade(prefix) {
+		var ogr = infoRaw(prefix);
+		if (ogr == null) return -1;
+		var ogp = ("" + ogr).split("\\\\\\\\");
+		if (ogp.length > 2) {
+			var oga = parseInt(ogp[ogp.length - 1].replace(/§./g, ""), 10);
+			if (!isNaN(oga)) return oga;
+		}
+		var ogt = infoText(prefix);
+		var ogn = (ogt == null) ? null : ogt.replace(/§./g, "").match(/[0-9]+/g);
+		return (ogn == null) ? -1 : parseInt(ogn[ogn.length - 1], 10);
+	}
+	function eohGradeName(gv) {
+		if (gv <= 0) return null;
+		return WHITE + (gv == 9 ? BOLD : "") + EOHGENT[gv - 1];
+	}
+	function eohPct(p) {
+		var os = Math.abs(p).toFixed(2);
+		while (os.length > 1 && os.charAt(os.length - 1) == "0") os = os.substring(0, os.length - 1);
+		if (os.charAt(os.length - 1) == ".") os = os.substring(0, os.length - 1);
+		return os;
+	}
+	var EOHDBG = "";
+	function eohBlockTier() {
+		EOHDBG = "无方块";
+		if (nbt['Inventory'] == undefined || nbt['Inventory']['0'] == undefined) {EOHDBG = "无物品"; return -1}
+		var obId = nbt['Inventory']['0']['id'];
+		var obBlk = null;
+		try {
+			obBlk = Java.type('net.minecraft.block.Block').getBlockFromItem(Java.type('net.minecraft.item.Item').getItemById(obId))
+		} catch (oe1) {
+			try {
+				obBlk = Java.type('net.minecraft.block.Block').func_149634_a(Java.type('net.minecraft.item.Item').func_150899_d(obId))
+			} catch (oe2) {
+				EOHDBG = ("" + oe2).substring(0, 60);
+				return -1;
+			}
+		}
+		if (obBlk == null) return -1;
+		try {
+			EOHDBG = "" + obBlk.getClass().getName();
+			return obBlk.getDimensionRocketTier();
+		} catch (oe3) {
+			return -1;
+		}
 	}
 	function capCounts() {
 		var ocr = { UHV: 0, UEV: 0, UIV: 0, UMV: 0 };
@@ -227,11 +270,11 @@
 	}
 	function tierVoltage(vv) {
 		if (vv > 536870915) return 536870912;
-		for (var oi3 = 0; oi3 < 13; oi3++) {
-			var otie = 8 * Math.pow(4, oi3 + 1);
-			if (8 * Math.pow(4, oi3) <= vv && vv <= otie) return otie;
+		for (var oi3 = 0; oi3 < 14; oi3++) {
+			var otie = 8 * Math.pow(4, oi3);
+			if (otie <= vv && vv < 8 * Math.pow(4, oi3 + 1)) return otie;
 		}
-		return 32;
+		return 8;
 	}
 	function fmtAmps(a) {
 		if (a < 10) {
@@ -242,6 +285,8 @@
 		}
 		return standards(a.toFixed(0));
 	}
+
+	/* 默认不显示MAX+，要开启需要删去函数内的注释符号 */
 	function avgPower(val) {
 		var pv = parseInt(val);
 		if (!(pv > 0)) return null;
@@ -249,9 +294,17 @@
 		var isMaxTier = (pv >= 21474836);
 		var valStr = (pv < 1e12) ? standards(pv) : sci_format("" + pv);
 		var normalV = tierVoltage(pv);
-		var normalTier = (pv > 536870915) ? VTier[12] : GetVtier(pv);
+		var normalTier = GetVtier(pv);
 		var normalLine = TAB + ALIGNRIGHT + YELLOW + fmtAmps(pv / normalV) + GOLD + " A " + normalTier;
-		var maxLine = "§d§k6§r§dMAX-Tier§k6" + TAB + ALIGNRIGHT + YELLOW + fmtAmps(pv / 2147483640) + GOLD + " A " + (isRainbow ? colorcir('MAX',3,1) : colorcir('MAX',3));
+		var maxA = pv / 2147483640;
+		var mpStr = "";
+		/*
+		var mpN = 0;
+		var mpA = maxA;
+		while (mpA >= 4 && mpN < 33) { mpA = mpA / 4; mpN++; }
+		mpStr = (mpN > 0) ? (AQUA + " ( " + YELLOW + fmtAmps(mpA) + GOLD + " A " + colorcir('MAX+' + mpN,3,1) + AQUA + " )") : "";
+		*/
+		var maxLine = "§d§k6§r§dMAX-Tier§k6" + TAB + ALIGNRIGHT + YELLOW + fmtAmps(maxA) + GOLD + " A " + (isRainbow ? colorcir('MAX',3,1) : colorcir('MAX',3)) + mpStr;
 		if (!isMaxTier) return YELLOW + valStr + GOLD + " EU/t" + "\\n" + normalLine;
 		if (isRainbow) return YELLOW + valStr + GOLD + " EU/t" + "\\n" + maxLine;
 		return YELLOW + valStr + GOLD + " EU/t" + "\\n" + normalLine + "\\n" + maxLine;
@@ -353,10 +406,10 @@
 		</line>
     -->
 		<line displayname="§b机器加工">
-			if(nbt['mWorks']==0 && nbt['mActive']==1){return DRED+"倪"+RED+"哥"+YELLOW+"正"+GREEN+"在"+AQUA+"超"+DAQUA+"辛"+BLUE+"勤"+DBLUE+"工"+DPURPLE+'作'}
-			if(nbt['mWorks']==0 && nbt['mActive']==0){return DBLUE+"倪"+BLUE+"哥"+DAQUA+"正"+AQUA+"在"+GREEN+"快"+YELLOW+"乐"+RED+"摸"+DRED+"鱼"}
-			if(nbt['mWorks']==1 && nbt['mActive']==1){return YELLOW+'激爽下班'}
-			if(nbt['mWorks']==1){return DRED+"农"+RED+"具"+YELLOW+"已"+GREEN+"经"+AQUA+"被"+DAQUA+"正"+BLUE+"确"+DBLUE+"安"+DPURPLE+'放'}
+			if(nbt['mWorks']==0 && nbt['mActive']==1){return rainbow("倪哥正在超辛勤工作")}
+			if(nbt['mWorks']==0 && nbt['mActive']==0){return rainbow("倪哥正在快乐摸鱼", 0, 270, 1)}
+			if(nbt['mWorks']==1 && nbt['mActive']==1){return rainbow("激爽下班")}
+			if(nbt['mWorks']==1){return rainbow("农具已经被正确安放", 0, 270, 1)}
 		</line>
 		<line displayname="§b活化器高度">
 			if(nbt['mID']==32013){return
@@ -674,6 +727,9 @@
 		</line>
 	
 		<!--XX超维度等离子锻炉XX -->
+		<line displayname="§6连续运行时间">
+			if (nbt['mID']==1004 && nbt['eRunningTime']!=undefined){return GOLD+formatTimes(nbt['eRunningTime'])}
+		</line>
 		<line displayname="§6催化剂折扣">
 			if (nbt['mID']==1004 && nbt['eLongDiscountValue']!=1){
 				return GOLD+((1-nbt['eLongDiscountValue'])*100).toFixed(2)+'%'
@@ -683,6 +739,14 @@
 			if (nbt['mID']==1004 && nbt['convergence']==0){return RED+'先这样,再那样,就能打开了'}
 			if (nbt['mID']==1004 && nbt['convergence']==1){return animatedText("空间同步","坐标对齐","矩阵校准",0,DRED)}
 		</line>
+		<line displayname="§6每并行额外消耗催化剂">
+			var dRaw = (nbt['mID']==1004) ? infoRaw("GT5U.infodata.plasma_forge.ticks_run_fuel_discount") : null;
+			if (dRaw != null){
+				var dPs = ("" + dRaw).split("\\\\\\\\");
+				if (parseInt(dPs[3]) > 0){return AQUA+standards(parseInt(dPs[3]))+YELLOW+"L"}
+			}
+		</line>
+		<!--XX黑洞压缩机XX -->
 		<line displayname="§d黑洞状态">
 			if (nbt['mID']==3008){
 				switch(nbt['blackHoleStatus']){
@@ -767,7 +831,7 @@
 		
 		<line displayname="§b当前模式 ">
             if(nbt['doVoidExcess']==1){return YELLOW+'溢出销毁'}
-			if(isBetween(11100,11107,nbt['mID']))
+			if(11100 <= nbt['mID'] && nbt['mID'] <= 11107)
 				switch(nbt['mAccelMode']){
 				case 0:return Mode('方块模式');break;
 				case 1:return Mode('实体模式');break;
@@ -895,6 +959,47 @@
 			}
 		</line>
 
+		<line displayname="§6运行配方">
+			if (nbt['mID']!=15410 || nbt['Inventory']==undefined || nbt['Inventory']['0']==undefined){return null}
+			var gRN = name(nbt['Inventory']['0']);
+			var gRT = eohBlockTier();
+			if (gRT < 0){return YELLOW + gRN + " §8[" + EOHDBG + "]"}
+			if (gRN.indexOf("T" + gRT + ": ") != 0){gRN = "T" + gRT + ": " + gRN}
+			return YELLOW + gRN
+		</line>
+
+		<line displayname="§6压缩时空场">
+			var gEOHC = eohGrade("tt.infodata.eoh.spacetime_compression.grade");
+			if (nbt['mID']!=15410 || gEOHC<=0){return null}
+			var gEOHCmax = (gEOHC > 8) ? 10 : gEOHC;
+			var gEOHCt = "";
+			var gEOHRa = eohBlockTier();
+			if (gEOHRa >= 0){
+				var gEOHCd = (1 - Math.pow(0.97, Math.max(0, gEOHC - 1 - Math.min(8, Math.max(0, gEOHRa - 1))))) * 100;
+				if (gEOHCd > 0){gEOHCt = "\\n" + animatedText("配方耗时","时序快进","星体凋亡",0,LPURPLE) + TAB + ALIGNRIGHT + YELLOW + "-" + eohPct(gEOHCd) + AQUA + "%"}
+			}
+			return eohGradeName(gEOHC) + gEOHCt + "\\n" + animatedText("配方上限","目力之极","深渊回望",0,LPURPLE) + TAB + ALIGNRIGHT + WHITE + (gEOHCmax > 9 ? BOLD : "") + "T" + gEOHCmax
+		</line>
+
+		<line displayname="§6时间膨胀场">
+			var gEOHT = eohGrade("tt.infodata.eoh.time_dilation.grade");
+			if (nbt['mID']!=15410 || gEOHT<=0){return null}
+			return eohGradeName(gEOHT) + "\\n" +
+				animatedText("配方耗时","时序快进","星体凋亡",0,LPURPLE) + TAB + ALIGNRIGHT + YELLOW + "-" + eohPct((1 - Math.pow(2, 1 - gEOHT)) * 100) + AQUA + "%" + "\\n" +
+				animatedText("成功几率","星象校准","因果锚定",0,LPURPLE) + TAB + ALIGNRIGHT + YELLOW + "-" + eohPct((gEOHT - 1) * 9.25) + AQUA + "%"
+		</line>
+
+		<line displayname="§6稳定力场">
+			var gEOHS = eohGrade("tt.infodata.eoh.stabilisation.grade");
+			if (nbt['mID']!=15410 || gEOHS<=0){return null}
+			var gEOHSm = (gEOHS - 1) * 5;
+			var gEOHSw = (9 - gEOHS) * 5;
+			return eohGradeName(gEOHS) + "\\n" +
+				animatedText("物质产量","口袋宇宙","星尘汲取",0,LPURPLE) + TAB + ALIGNRIGHT + YELLOW + "-" + eohPct(gEOHSm) + AQUA + "%" + "\\n" +
+				animatedText("成功几率","星象校准","因果锚定",0,LPURPLE) + TAB + ALIGNRIGHT + YELLOW + "+" + eohPct(gEOHSm) + AQUA + "%" +
+				(gEOHSw > 0 ? ("\\n" + animatedText("能量输出","星核涌流","永恒能源",0,LPURPLE) + TAB + ALIGNRIGHT + YELLOW + "-" + eohPct(gEOHSw) + AQUA + "%") : "")
+		</line>
+
 		<line displayname="§6成功几率">
 			if (nbt['eyeOfHarmonyOutputrecipeSuccessChance']!=undefined && nbt['mActive']==1){
 				return Percent(nbt['eyeOfHarmonyOutputrecipeSuccessChance'].toFixed(2)*100)
@@ -910,9 +1015,6 @@
 			if (nbt['mID']==15410 && PAeoh!=0 && AAeoh!=0){return YELLOW+standards(PAeoh)}
 		</line>
 
-		<line displayname="§6运行配方">
-			if (nbt['mWorks']>=0 && nbt['mID']==15410){return YELLOW+name(nbt['Inventory']['0'])}
-		</line>
 		<line displayname="§6输出电量">
 			EUOutputEOH = formatBytes3(""+nbt['eyeOfHarmonyOutputoutputEU_BigInt']);
 			if (nbt['mActive']==1 && nbt['mID']==15410){return YELLOW+sci_format(EUOutputEOH)+GOLD+" EU"}
@@ -1431,10 +1533,10 @@
 		<line displayname="§d电容数量">
 			var capC = capCounts();
 			var cp = [];
-			if(capC.UHV > 0) cp.push(VTier[8] + GOLD + "×" + capC.UHV);
-			if(capC.UEV > 0) cp.push(VTier[9] + GOLD + "×" + capC.UEV);
-			if(capC.UIV > 0) cp.push(VTier[10] + GOLD + "×" + capC.UIV);
-			if(capC.UMV > 0) cp.push(VTier[11] + GOLD + "×" + capC.UMV);
+			if(capC.UHV > 0) cp.push(VTier[9] + GOLD + "×" + capC.UHV);
+			if(capC.UEV > 0) cp.push(VTier[10] + GOLD + "×" + capC.UEV);
+			if(capC.UIV > 0) cp.push(VTier[11] + GOLD + "×" + capC.UIV);
+			if(capC.UMV > 0) cp.push(VTier[12] + GOLD + "×" + capC.UMV);
 			if(cp.length > 0) return cp.join(" ");
 		</line>
 		<line displayname="§d电容最大下载功率">
@@ -1443,7 +1545,7 @@
 				var capOut = avgPower(Math.round(capD.UHV * 1e10 + capD.UEV * 1e12 + capD.UIV * 1e14 + capD.UMV * 1e16));
 				var wEu = infoNum('kekztech.infodata.lapotronic_super_capacitor.wireless_eu');
 				if(wEu != null && wEu != '0'){
-					capOut = capOut + "\\n" + animatedText('无线电网', '虚空储能', '以太之力', 0, DRED) + TAB + ALIGNRIGHT + YELLOW + formatEU(wEu) + GOLD + " EU";
+					capOut = capOut + "\\n" + animatedText('无线电网', '虚空储能', '以太之力', 0, DRED) + TAB + ALIGNRIGHT + YELLOW + (wEu.length > 15 ? sci_format(wEu) : standards(wEu)) + GOLD + " EU";
 				}
 				return capOut;
 			}
